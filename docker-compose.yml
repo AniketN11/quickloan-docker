@@ -1,0 +1,61 @@
+services:
+
+  web:
+    build: .
+    container_name: quickloan-web
+
+    ports:
+      - "8080:80"
+
+    environment:
+      DB_HOST: db
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - quickloan-network
+
+    restart: always
+
+
+  db:
+    image: mysql:8.0
+    container_name: quickloan-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+    networks:
+      - quickloan-network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'mysqladmin ping -h 127.0.0.1 -uroot -p"$${MYSQL_ROOT_PASSWORD}" --silent'
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    restart: always
+
+
+networks:
+  quickloan-network:
+    driver: bridge
+
+
+volumes:
+  mysql-data:

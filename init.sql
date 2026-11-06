@@ -1,0 +1,17 @@
+USE quickloan_db;
+
+CREATE TABLE IF NOT EXISTS applications (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+
+    contact VARCHAR(20) NOT NULL,
+
+    email VARCHAR(100) NOT NULL,
+
+    loan_type VARCHAR(50) NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
